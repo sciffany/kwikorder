@@ -1,19 +1,20 @@
 const mongoose = require('mongoose');
 
+const orderSchema = new mongoose.Schema({
+  quantity: { type: Number, required: true },
+  food: {
+    type: 'ObjectId',
+    ref: 'Food',
+    required: true,
+  },
+});
+
 const cartSchema = new mongoose.Schema({
-  id: String,
-  customer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  date: Date,
-  orders: [
-    {
-      quantity: Number,
-      food: {
-        type: 'ObjectId',
-        ref: 'Food',
-      },
-    },
-  ],
-  status: String,
+  customer: { type: 'ObjectId', ref: 'User', required: true },
+  restaurant: { type: 'ObjectId', ref: 'Restaurant', required: true },
+  date: { type: Date, default: new Date() },
+  orders: [orderSchema],
+  status: { type: String, enum: ['NEW', 'PROCESSING', 'PAID'], default: 'NEW' },
 });
 
 module.exports = mongoose.model('Cart', cartSchema);

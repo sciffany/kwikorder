@@ -1,10 +1,11 @@
 const Cart = require('../models/Cart');
+const mongoose = require('mongoose');
 
 exports.create = async (req, res) => {
   try {
     let cart = new Cart(req.body);
     cart = await cart.save();
-    res.status(200).json(food);
+    res.status(200).json(cart);
   } catch (err) {
     res.send(err.toString());
   }
@@ -12,10 +13,40 @@ exports.create = async (req, res) => {
 
 exports.read = async (req, res) => {
   try {
-    const cart = await Food.Cart({ _id: req.params.id });
-    res.status(200).json(food);
+    const cart = await Cart.findOne({ _id: req.params.id });
+    res.status(200).json(cart);
   } catch (err) {
     res.status(404).send(err.toString());
+  }
+};
+
+exports.addFood = async (req, res) => {
+  try {
+    const { food, quantity } = req.body;
+    let cart = await Cart.findOne({ _id: req.body.id });
+
+    if (!food || !quantity) {
+      res.end('Food or quantity missing');
+    } else {
+      // Merge food orders if same food
+      let foodPreviouslyOrdered = false;
+      cart.orders.forEach((order) => {
+        if (order.food.toString() === food) {
+          foodPreviouslyOrdered = true;
+          order.quantity += parseInt(quantity);
+        }
+      });
+
+      // Add to cart
+      if (!foodPreviouslyOrdered) {
+        cart.orders.push({ food, quantity });
+      }
+
+      await cart.save();
+      res.status(200).send(cart);
+    }
+  } catch (err) {
+    res.send(err.toString());
   }
 };
 
@@ -40,9 +71,9 @@ exports.delete = async (req, res) => {
       _id: req.params.id,
     });
     if (!cart) {
-      res.status(404).json('Note not found');
+      res.status(404).json('Cart not found');
     } else {
-      res.status(200).json('Note deleted successfully');
+      res.status(200).json('Cart deleted successfully');
     }
   } catch (err) {
     res.status(500).json('Internal server error');
@@ -59,29 +90,68 @@ exports.readAll = async (req, res) => {
   }
 };
 
-exports.addToCart = async (req, res) => {
+exports.updateFood = async (req, res) => {
   try {
-    const cart = await Cart.findByIdAndUpdate(req.params.id, {
-      cart: req.params.cartId,
-    });
-    const cart = await Cart.findByIdAndUpdate(req.params.id, {
-      orders: [...{ cart: req.params.id, quantity: req.params.quantity }],
-    });
+    const { food, quantity } = req.body;
+    let cart = await Cart.findOne({ _id: req.body.id });
 
-    res.status(200).json();
+    if (!food || !quantity) {
+      res.end('Food or quantity missing');
+    } else {
+      cart.orders.forEach((order) => {
+        if (order.food.toString() === food) {
+          order.quantity = parseInt(quantity);
+        }
+      });
+
+      await cart.save();
+      res.status(200).send(cart);
+    }
   } catch (err) {
-    res.status(404).send(err.toString());
+    res.send(err.toString());
   }
 };
 
-exports.removeFromCart = async (req, res) => {
+exports.updateFood = async (req, res) => {
   try {
-    const cart = await Cart.findByIdAndRemove(req.params.id, {
-      orders: [...{ cart: req.params.id, quantity: req.params.quantity }],
-    });
+    const { status } = req.body;
+    let cart = await Cart.findOne({ _id: req.body.id });
 
-    res.status(200).json(cart);
+    if (!food || !quantity) {
+      res.end('Food or quantity missing');
+    } else {
+      cart.orders.forEach((order) => {
+        if (order.food.toString() === food) {
+          order.quantity = parseInt(quantity);
+        }
+      });
+
+      await cart.save();
+      res.status(200).send(cart);
+    }
   } catch (err) {
-    res.status(404).send(err.toString());
+    res.send(err.toString());
+  }
+};
+
+exports.updateStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    let cart = await Cart.findOne({ _id: req.body.id });
+
+    if (!food || !quantity) {
+      res.end('Food or quantity missing');
+    } else {
+      cart.orders.forEach((order) => {
+        if (order.food.toString() === food) {
+          order.quantity = parseInt(quantity);
+        }
+      });
+
+      await cart.save();
+      res.status(200).send(cart);
+    }
+  } catch (err) {
+    res.send(err.toString());
   }
 };
