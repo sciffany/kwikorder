@@ -5,7 +5,7 @@ const cart = require('../controllers/CartController');
 
 router.put('/add', cart.addFood);
 router.put('/update', cart.updateFood);
-router.put('/status', cart.update);
+router.put('/status', cart.updateStatus);
 
 router.post('/', cart.create);
 router.delete('/:id', cart.delete);

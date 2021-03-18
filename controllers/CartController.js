@@ -1,5 +1,4 @@
 const Cart = require('../models/Cart');
-const mongoose = require('mongoose');
 
 exports.create = async (req, res) => {
   try {
@@ -25,6 +24,10 @@ exports.addFood = async (req, res) => {
     const { food, quantity } = req.body;
     let cart = await Cart.findOne({ _id: req.body.id });
 
+    if (cart.status.toString() !== 'NEW') {
+      res.status(403).send('Cannot update food that is already paid for');
+    }
+
     if (!food || !quantity) {
       res.end('Food or quantity missing');
     } else {
@@ -47,21 +50,6 @@ exports.addFood = async (req, res) => {
     }
   } catch (err) {
     res.send(err.toString());
-  }
-};
-
-exports.update = async (req, res) => {
-  try {
-    const updatedCart = await Food.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    if (!updatedCart) {
-      res.status(400).send('Food not found');
-    } else {
-      res.status(200).send(updatedCart);
-    }
-  } catch (err) {
-    res.status(500).send(err.toString());
   }
 };
 
@@ -95,27 +83,9 @@ exports.updateFood = async (req, res) => {
     const { food, quantity } = req.body;
     let cart = await Cart.findOne({ _id: req.body.id });
 
-    if (!food || !quantity) {
-      res.end('Food or quantity missing');
-    } else {
-      cart.orders.forEach((order) => {
-        if (order.food.toString() === food) {
-          order.quantity = parseInt(quantity);
-        }
-      });
-
-      await cart.save();
-      res.status(200).send(cart);
+    if (cart.status.toString() !== 'NEW') {
+      res.status(403).send('Cannot update food that is already paid for');
     }
-  } catch (err) {
-    res.send(err.toString());
-  }
-};
-
-exports.updateFood = async (req, res) => {
-  try {
-    const { status } = req.body;
-    let cart = await Cart.findOne({ _id: req.body.id });
 
     if (!food || !quantity) {
       res.end('Food or quantity missing');
@@ -136,21 +106,12 @@ exports.updateFood = async (req, res) => {
 
 exports.updateStatus = async (req, res) => {
   try {
-    const { status } = req.body;
-    let cart = await Cart.findOne({ _id: req.body.id });
+    let cart = await Cart.findOneAndUpdate({ _id: req.body.id }, req.body, {
+      new: true,
+    });
 
-    if (!food || !quantity) {
-      res.end('Food or quantity missing');
-    } else {
-      cart.orders.forEach((order) => {
-        if (order.food.toString() === food) {
-          order.quantity = parseInt(quantity);
-        }
-      });
-
-      await cart.save();
-      res.status(200).send(cart);
-    }
+    await cart.save();
+    res.status(200).send(cart);
   } catch (err) {
     res.send(err.toString());
   }
