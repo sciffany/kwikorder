@@ -22,15 +22,11 @@ app.use(express.urlencoded({ extended: true }));
 // Route handlers
 /////////////////////
 
+app.use(require('./middlewares/roles'));
 app.use('/', require('./routes/index'));
 app.use('/restaurants', require('./routes/restaurants'));
 app.use('/users', require('./routes/users'));
 app.use('/foods', require('./routes/foods'));
-
-app.use((req, res, next) => {
-  console.log('Hello from the middleware!👋');
-  next();
-});
 
 app.use('/carts', require('./routes/carts'));
 require('./routes');

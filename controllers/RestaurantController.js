@@ -7,7 +7,7 @@ exports.create = async (req, res) => {
     res.status(200);
     res.json(restaurant);
   } catch (err) {
-    res.status(500);
+    res.send(err.toString());
   }
 };
 
@@ -47,10 +47,10 @@ exports.delete = async (req, res) => {
     });
     if (!restaurant) {
       res.status(404);
-      res.json('Note not found');
+      res.json('Restaurant not found');
     } else {
       res.status(200);
-      res.json('Note deleted successfully');
+      res.json('Restaurant deleted successfully');
     }
   } catch (err) {
     res.status(500);

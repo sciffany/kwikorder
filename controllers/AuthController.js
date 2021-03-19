@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { promisify } = require('util');
 require('dotenv').config();
 
 const createToken = (id) =>
@@ -45,4 +46,43 @@ exports.login = async (req, res) => {
   }
   const token = createToken(user._id);
   res.status(200).json({ token });
+};
+
+exports.protect = async (req, res, next) => {
+  try {
+    // Get token
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (!token) {
+      res.status(401).send('Not logged in!');
+    }
+
+    // Verify token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    if (!decoded) {
+      res.status(402).send('Token is not authentic');
+    }
+
+    // Check if user still exists
+    // User changed password after
+  } catch (err) {
+    res.send(err.toString());
+  }
+  next();
+};
+
+exports.restrictTo = (...roles) => {
+  return async (req, res, next) => {
+    if (roles.includes(req.role)) {
+      next();
+    } else {
+      res.status(403).send('Not authorised');
+    }
+  };
 };
