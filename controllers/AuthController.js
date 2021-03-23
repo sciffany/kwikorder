@@ -15,6 +15,7 @@ exports.signup = async (req, res, next) => {
       email: req.body.email,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
+      role: req.body.role,
     });
 
     const token = createToken(user._id);
@@ -29,7 +30,7 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    res.send('Please provide email or password');
+    res.status(401).send('Please provide email or password');
   }
 
   const user = await User.findOne({
@@ -37,10 +38,10 @@ exports.login = async (req, res) => {
   }).select('+password');
 
   if (!user) {
-    res.send('Email is incorrect');
+    res.status(401).send('Email is incorrect');
   }
   const correct = await user.correctPassword(password, user.password);
-
+  console.log('correct', correct);
   if (!correct) {
     res.status(401).send('Password is incorrect');
   }

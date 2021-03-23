@@ -2,7 +2,10 @@ const Food = require('../models/Food');
 
 exports.create = async (req, res) => {
   try {
+    console.log('req', req.body);
+
     let food = new Food(req.body);
+
     food = await food.save();
     res.status(200).json(food);
   } catch (err) {

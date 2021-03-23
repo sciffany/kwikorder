@@ -8,8 +8,7 @@ const foodSchema = new mongoose.Schema({
   startDate: Date,
   endDate: Date,
   category: { type: String, required: true },
-  restaurant: { type: 'ObjectId', ref: 'Restaurant' },
-  cart: { type: 'ObjectId', ref: 'Cart' },
+  restaurant: { type: 'ObjectId', ref: 'Restaurant', required: true },
 });
 
 module.exports = mongoose.model('Food', foodSchema);

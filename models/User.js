@@ -32,10 +32,12 @@ const userSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
   },
-  restaurantOwned: {
-    type: 'ObjectId',
-    ref: 'Restaurant',
-  },
+  restaurantsOwned: [
+    {
+      type: 'ObjectId',
+      ref: 'Restaurant',
+    },
+  ],
   role: {
     type: String,
     enum: ['Customer', 'Owner', 'Admin', 'Server'],
