@@ -8,7 +8,7 @@ const createToken = (id) =>
     expiresIn: '90d',
   });
 
-exports.signup = async (req, res, next) => {
+exports.signup = async (req, res) => {
   try {
     let user = await new User({
       name: req.body.name,
@@ -21,6 +21,7 @@ exports.signup = async (req, res, next) => {
     const token = createToken(user._id);
 
     await user.save();
+    console.log(user);
     res.status(200).json({ token, data: user });
   } catch (err) {
     res.send(err.toString());

@@ -77,7 +77,6 @@ exports.delete = async (req, res) => {
  */
 exports.readAll = async (req, res) => {
   try {
-    console.log('Reading all food');
     const foods = await Food.find()
       .where('restaurant')
       .equals(req.query.restaurant);

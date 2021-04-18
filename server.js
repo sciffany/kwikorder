@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const app = express();
 
 ////////////////////////
-// Morgan middlewares
+// Middlewares
 /////////////////////////
 
 app.use(morgan('dev'));
@@ -15,7 +15,7 @@ connectDB();
 
 const MongoClient = require('mongodb').MongoClient;
 
-const bodyParser = require('body-parser');
+require('body-parser');
 app.use(express.urlencoded({ extended: true }));
 
 //////////////////////
@@ -23,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 /////////////////////
 
 app.use(require('./middlewares/roles'));
+
 app.use('/', require('./routes/index'));
 app.use('/restaurants', require('./routes/restaurants'));
 app.use('/users', require('./routes/users'));
