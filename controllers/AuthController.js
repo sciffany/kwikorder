@@ -62,6 +62,7 @@ exports.protect = async (req, res, next) => {
 
     if (!token) {
       res.status(401).send('Not logged in!');
+      return;
     }
 
     // Verify token

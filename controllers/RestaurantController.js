@@ -2,12 +2,26 @@ const Restaurant = require('../models/Restaurant');
 
 exports.create = async (req, res) => {
   try {
-    let restaurant = new Restaurant(req.body);
+    let restaurant = new Restaurant(
+      Object.assign(req.body, { owner: req.user._id })
+    );
+    console.log('restaurant', restaurant);
     restaurant = await restaurant.save();
-    res.status(200);
-    res.json(restaurant);
+    res.status(200).send(restaurant);
   } catch (err) {
     res.send(err.toString());
+  }
+};
+
+exports.readAll = async (req, res) => {
+  try {
+    const restaurants = await Restaurant.find()
+      .where('owner')
+      .equals(req.user._id);
+
+    res.status(200).json(restaurants);
+  } catch (err) {
+    res.status(404);
   }
 };
 

@@ -2,8 +2,21 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+/**
+ * This component determines the user and the role based on the bearer token presented
+ * @param {*} req request
+ * @param {*} res response
+ * @param {*} next callback function
+ * @returns
+ */
 const rolesMiddleware = async (req, res, next) => {
-  console.log('Hello from the middleware!👋');
+  console.log('Initialising roles middleware');
+
+  res.header('Access-Control-Allow-Headers', 'authorization, content-type');
+  res.header(
+    'Access-Control-Allow-Methods',
+    'GET,PUT,POST,DELETE,PATCH,OPTIONS'
+  );
 
   let token;
   if (
@@ -12,16 +25,17 @@ const rolesMiddleware = async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1];
   }
-  if (!token) return next();
-  const { id } = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  if (!id) return next();
-  const user = await User.findOne({ _id: id });
-  if (!user) return next();
-  req.role = user.role;
+  try {
+    const { id } = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ _id: id });
+    req.role = user.role;
+    req.user = user;
 
-  console.log(req.role);
-  return next();
+    return next();
+  } catch (err) {
+    return next();
+  }
 };
 
 module.exports = rolesMiddleware;

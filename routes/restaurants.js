@@ -6,6 +6,7 @@ const restaurant = require('../controllers/RestaurantController');
 
 router.route('/').post(auth.protect, restaurant.create);
 router.get('/:id', restaurant.read);
+router.get('/', restaurant.readAll);
 router.put('/:id', restaurant.update);
 router
   .route('/:id')
